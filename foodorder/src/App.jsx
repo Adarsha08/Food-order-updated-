@@ -7,7 +7,8 @@ import {Router, Routes, Route, Navigate } from 'react-router-dom'
 import Home from './pages/Home'
 import './index.css'
 import Login from './pages/Login'
-// import DeliveryDashboard from './pages/DeliveryDashboard'
+import DeliveryRegister from './pages/DeliveryRegister'
+import DeliveryDashboard from './pages/DeliveryDashboard'
 import { ToastContainer } from 'react-toastify'
 import 'react-toastify/dist/ReactToastify.css'
 
@@ -55,6 +56,7 @@ const App = () => {
         <Routes>
           {/* Public Routes */}
           <Route path="/login" element={<Login />} />
+          <Route path="/delivery-register" element={<DeliveryRegister />} />
           
           {/* User Route */}
           <Route 
@@ -66,15 +68,15 @@ const App = () => {
             } 
           />
           
-          {/* Delivery Route - Uncomment when ready */}
-          {/* <Route 
+          {/* Delivery Route */}
+          <Route 
             path="/delivery-dashboard" 
             element={
               <ProtectedRoute allowedRole="delivery">
                 <DeliveryDashboard />
               </ProtectedRoute>
             } 
-          /> */}
+          />
         </Routes>
         
         <ToastContainer

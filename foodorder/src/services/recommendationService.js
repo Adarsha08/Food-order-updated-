@@ -1,4 +1,4 @@
-const API_BASE_URL = 'http://localhost:5000/api/recommendations';
+const API_BASE_URL = 'http://localhost:5001/api/recommendations';
 
 // Track user preferences after order is placed
 export const trackUserPreferences = async (userData) => {

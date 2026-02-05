@@ -8,6 +8,7 @@ function Login() {
   const [phone, setPhone] = useState('');
   const [otp, setOtp] = useState('');
   const [name, setName] = useState('');
+  const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [otpSent, setOtpSent] = useState(false);
   const [loading, setLoading] = useState(false);
@@ -24,7 +25,7 @@ function Login() {
 
     setLoading(true);
     try {
-      const res = await fetch('http://localhost:5000/api/auth/send-otp', {
+      const res = await fetch('http://localhost:5001/api/auth/send-otp', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ phone })
@@ -51,7 +52,7 @@ function Login() {
 
     setLoading(true);
     try {
-      const res = await fetch('http://localhost:5000/api/auth/verify-otp', {
+      const res = await fetch('http://localhost:5001/api/auth/verify-otp', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ phone, otp, name })
@@ -71,6 +72,38 @@ function Login() {
     setLoading(false);
   };
 
+  const loginDeliveryMan = async () => {
+    if (!email || !email.includes('@')) {
+      toast.error('Please enter a valid email');
+      return;
+    }
+    if (!password) {
+      toast.error('Please enter your password');
+      return;
+    }
+
+    setLoading(true);
+    try {
+      const res = await fetch('http://localhost:5001/api/auth/login-delivery', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email, password })
+      });
+      const data = await res.json();
+      if (data.success) {
+        localStorage.setItem('token', data.token);
+        localStorage.setItem('user', JSON.stringify(data.user));
+        toast.success('Login successful!');
+        navigate('/delivery-dashboard');
+      } else {
+        toast.error(data.error || 'Invalid credentials');
+      }
+    } catch (error) {
+      toast.error('Network error. Please try again.');
+    }
+    setLoading(false);
+  };
+
   const loginWithPassword = async () => {
     if (!phone || phone.length !== 10) {
       toast.error('Please enter a valid 10-digit phone number');
@@ -83,7 +116,7 @@ function Login() {
 
     setLoading(true);
     try {
-      const res = await fetch('http://localhost:5000/api/auth/login-password', {
+      const res = await fetch('http://localhost:5001/api/auth/login-password', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ phone, password })
@@ -241,13 +274,13 @@ function Login() {
             <div className="space-y-5">
               <div>
                 <label className="block text-sm font-semibold text-gray-700 mb-2">
-                  Phone Number
+                  Email Address
                 </label>
                 <input
-                  type="tel"
-                  placeholder="Enter 10-digit number"
-                  value={phone}
-                  onChange={(e) => setPhone(e.target.value.replace(/\D/g, '').slice(0, 10))}
+                  type="email"
+                  placeholder="Enter your email"
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
                   className="w-full px-4 py-3 border-2 border-gray-200 rounded-xl focus:border-orange-500 focus:ring-4 focus:ring-orange-100 transition-all outline-none"
                 />
               </div>
@@ -264,11 +297,17 @@ function Login() {
                 />
               </div>
               <button
-                onClick={loginWithPassword}
+                onClick={loginDeliveryMan}
                 disabled={loading}
                 className="w-full bg-gradient-to-r from-orange-500 to-red-500 text-white py-4 rounded-xl font-bold text-lg hover:from-orange-600 hover:to-red-600 transform hover:scale-[1.02] transition-all shadow-lg hover:shadow-xl disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none"
               >
                 {loading ? 'Logging in...' : 'Login'}
+              </button>
+              <button
+                onClick={() => navigate('/delivery-register')}
+                className="w-full text-center text-orange-600 font-semibold hover:text-orange-700 transition-colors border-2 border-orange-300 py-3 rounded-xl"
+              >
+                Don't have an account? Register here
               </button>
             </div>
           )}
@@ -283,8 +322,8 @@ function Login() {
                 </>
               ) : (
                 <>
-                  <span className="inline-block mr-1">🔒</span>
-                  Delivery staff only. Contact admin for credentials.
+                  <span className="inline-block mr-1">🏍️</span>
+                  New delivery partner? Register with your details to get started!
                 </>
               )}
             </p>
