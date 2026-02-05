@@ -1,6 +1,6 @@
 import Order from '../models/Order.js';
 
-// Create a new order
+// naya order create garne 
 export const createOrder = async (req, res) => {
   try {
     const { userDetails, items, totalAmount } = req.body;
@@ -35,7 +35,7 @@ export const createOrder = async (req, res) => {
   }
 };
 
-// Get all orders
+// sabai order get garne 
 export const getAllOrders = async (req, res) => {
   try {
     const orders = await Order.find().sort({ createdAt: -1 });
@@ -54,7 +54,7 @@ export const getAllOrders = async (req, res) => {
   }
 };
 
-// Get order by ID
+// get order by id
 export const getOrderById = async (req, res) => {
   try {
     const order = await Order.findById(req.params.id);
@@ -80,7 +80,7 @@ export const getOrderById = async (req, res) => {
   }
 };
 
-// Update order status
+// update order status 
 export const updateOrderStatus = async (req, res) => {
   try {
     const { status } = req.body;
@@ -112,7 +112,7 @@ export const updateOrderStatus = async (req, res) => {
   }
 };
 
-// Delete order
+// delete order
 export const deleteOrder = async (req, res) => {
   try {
     const order = await Order.findByIdAndDelete(req.params.id);

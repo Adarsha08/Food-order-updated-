@@ -1,5 +1,6 @@
 import React, { useState } from 'react'
 import { createOrder } from '../services/orderService'
+import { trackUserPreferences } from '../services/recommendationService'
 import { toast } from 'react-toastify'
 
 const Checkout = ({ cart, quantities, onClose, onOrderSuccess }) => {
@@ -64,9 +65,24 @@ const Checkout = ({ cart, quantities, onClose, onOrderSuccess }) => {
     const response = await createOrder(orderData)
 
     if (response.success) {
+      // Track user preferences for recommendations
+      const preferencesData = {
+        name: formData.name,
+        email: formData.email,
+        phone: formData.phone,
+        address: formData.address,
+        orderedItems: cart.map((item) => ({
+          foodId: item.id,
+          foodName: item.food_name,
+          category: item.food_category,
+        })),
+      }
+
+      await trackUserPreferences(preferencesData)
+
       toast.success('🎉 Order placed successfully!')
       setFormData({ name: '', email: '', phone: '', address: '' })
-      onOrderSuccess()
+      onOrderSuccess(formData.email)
       onClose()
     } else {
       toast.error(response.message || 'Failed to place order')

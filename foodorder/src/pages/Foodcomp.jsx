@@ -1,8 +1,12 @@
 import React, { useState } from 'react'
 import Food from '../Components/Food'
+import RelatedItemsPopup from '../Components/RelatedItemsPopup'
 import { toast } from 'react-toastify';
 
 const Foodcomp = ({ cart, setCart, quantities, setQuantities, selectedCategory }) => {
+  const [showRelated, setShowRelated] = useState(false);
+  const [selectedItemForRelated, setSelectedItemForRelated] = useState(null);
+
   const filteredFood = !selectedCategory || selectedCategory === "All"
     ? Food
     : Food.filter(item => item.food_category === selectedCategory);
@@ -12,10 +16,20 @@ const Foodcomp = ({ cart, setCart, quantities, setQuantities, selectedCategory }
     setCart([...cart, { ...item, quantity }]);
     setQuantities({ ...quantities, [item.id]: "" });
     toast.success(`${item.food_name} added to cart! 🎉`, { autoClose: 2000 });
+    
+    // Show related items popup
+    setSelectedItemForRelated(item);
+    setShowRelated(true);
   };
 
   const addquantity = (id, value) => {
     setQuantities({ ...quantities, [id]: value });
+  };
+
+  const handleAddFromPopup = (item) => {
+    const quantity = 1;
+    setCart([...cart, { ...item, quantity }]);
+    setQuantities({ ...quantities, [item.id]: "" });
   };
 
   return (
@@ -95,6 +109,14 @@ const Foodcomp = ({ cart, setCart, quantities, setQuantities, selectedCategory }
           ))}
         </div>
       )}
+
+      {/* Related Items Popup */}
+      <RelatedItemsPopup
+        selectedItem={selectedItemForRelated}
+        isOpen={showRelated}
+        onClose={() => setShowRelated(false)}
+        onAddToCart={handleAddFromPopup}
+      />
     </div>
   )
 }

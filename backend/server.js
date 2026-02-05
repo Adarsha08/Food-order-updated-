@@ -3,6 +3,8 @@ import mongoose from 'mongoose';
 import cors from 'cors';
 import dotenv from 'dotenv';
 import orderRoutes from './routes/orderRoutes.js';
+import recommendationRoutes from './routes/recommendationRoutes.js';
+import authRoutes from './routes/auth.js';
 
 dotenv.config();
 
@@ -14,12 +16,14 @@ app.use(express.json());
 app.use(cors());
 
 // MongoDB Connection
-mongoose.connect(process.env.MONGODB_URI)
+mongoose.connect(process.env.MONGO_URL)
   .then(() => console.log('MongoDB connected'))
   .catch(err => console.log('MongoDB connection error:', err));
 
 // Routes
 app.use('/api/orders', orderRoutes);
+app.use('/api/recommendations', recommendationRoutes);
+app.use('/api/auth', authRoutes);
 
 // Health check
 app.get('/api/health', (req, res) => {

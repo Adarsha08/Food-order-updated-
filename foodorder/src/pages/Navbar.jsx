@@ -1,4 +1,5 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { GiCrossedBones } from "react-icons/gi";
 import { IoCartOutline } from "react-icons/io5";
 import { MdDelete } from "react-icons/md";
@@ -6,11 +7,27 @@ import { FiMenu, FiX } from "react-icons/fi";
 import { toast } from 'react-toastify';
 import Checkout from '../Components/Checkout';
 import OrderHistory from '../Components/OrderHistory';
+import RelatedItemsPopup from '../Components/RelatedItemsPopup';
+import { saveUserEmail } from '../utils/localStorage';
 
-const Navbar = ({ cart, setCart, quantities, setQuantities, searchTerm, setSearchTerm }) => {
+const Navbar = ({ cart, setCart, quantities, setQuantities, searchTerm, setSearchTerm, setUserEmail }) => {
   const [click, setclick] = useState(false);
   const [showCheckout, setShowCheckout] = useState(false);
   const [showOrderHistory, setShowOrderHistory] = useState(false);
+  const [userEmail, setUserEmailState] = useState(null);
+  const [showRelated, setShowRelated] = useState(false);
+  const [selectedItemForRelated, setSelectedItemForRelated] = useState(null);
+  const [currentUser, setCurrentUser] = useState(null);
+  const navigate = useNavigate();
+
+  useEffect(() => {
+    try {
+      const u = localStorage.getItem('user');
+      setCurrentUser(u ? JSON.parse(u) : null);
+    } catch (err) {
+      setCurrentUser(null);
+    }
+  }, []);
 
   const changequantity = (e) => {
     const id = e.target.id;
@@ -40,7 +57,10 @@ const Navbar = ({ cart, setCart, quantities, setQuantities, searchTerm, setSearc
     setShowCheckout(true);
   };
 
-  const handleOrderSuccess = () => {
+  const handleOrderSuccess = (email) => {
+    setUserEmailState(email);
+    setUserEmail(email);
+    saveUserEmail(email);
     setCart([]);
     setQuantities({});
     setclick(false);
@@ -71,9 +91,27 @@ const Navbar = ({ cart, setCart, quantities, setQuantities, searchTerm, setSearc
 
             {/* Right Section */}
             <div className="flex items-center gap-4">
-              <button className="bg-white text-orange-600 font-semibold px-6 py-2 rounded-full hover:bg-gray-100 transition-all duration-200 shadow-md">
-                Login
-              </button>
+              {!currentUser ? (
+                <button
+                  onClick={() => navigate('/login')}
+                  className="bg-white text-orange-600 font-semibold px-6 py-2 rounded-full hover:bg-gray-100 transition-all duration-200 shadow-md"
+                >
+                  Login
+                </button>
+              ) : (
+                <button
+                  onClick={() => {
+                    localStorage.removeItem('token');
+                    localStorage.removeItem('user');
+                    setCurrentUser(null);
+                    toast.info('Logged out');
+                    navigate('/login');
+                  }}
+                  className="bg-white text-orange-600 font-semibold px-6 py-2 rounded-full hover:bg-gray-100 transition-all duration-200 shadow-md"
+                >
+                  Logout
+                </button>
+              )}
 
               <button
                 onClick={() => setShowOrderHistory(true)}
@@ -206,6 +244,17 @@ const Navbar = ({ cart, setCart, quantities, setQuantities, searchTerm, setSearc
       {showOrderHistory && (
         <OrderHistory onClose={() => setShowOrderHistory(false)} />
       )}
+
+      {/* Related Items Popup */}
+      <RelatedItemsPopup
+        selectedItem={selectedItemForRelated}
+        isOpen={showRelated}
+        onClose={() => setShowRelated(false)}
+        onAddToCart={(item) => {
+          setCart([...cart, { ...item, quantity: 1 }]);
+          setQuantities({ ...quantities, [item.id]: "" });
+        }}
+      />
     </>
   );
 };
