@@ -47,6 +47,11 @@ const orderSchema = new mongoose.Schema(
       enum: ['Pending', 'Confirmed', 'Delivered'],
       default: 'Pending',
     },
+    deliveredBy: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: 'User',
+      default: null,
+    },
   },
   { timestamps: true }
 );

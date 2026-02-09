@@ -3,6 +3,7 @@ import {
   createOrder,
   getAllOrders,
   getOrderById,
+  getPendingOrders,
   updateOrderStatus,
   deleteOrder,
 } from '../controllers/orderController.js';
@@ -14,6 +15,9 @@ router.post('/', createOrder);
 
 
 router.get('/', getAllOrders);
+
+// Get pending orders for delivery dashboard
+router.get('/pending', getPendingOrders);
 
 
 router.get('/:id', getOrderById);

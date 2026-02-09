@@ -80,6 +80,25 @@ export const getOrderById = async (req, res) => {
   }
 };
 
+// Get pending orders for delivery dashboard
+export const getPendingOrders = async (req, res) => {
+  try {
+    const orders = await Order.find({ status: 'Pending' }).sort({ createdAt: -1 });
+
+    res.status(200).json({
+      success: true,
+      message: 'Pending orders fetched successfully',
+      data: orders,
+    });
+  } catch (error) {
+    res.status(500).json({
+      success: false,
+      message: 'Error fetching pending orders',
+      error: error.message,
+    });
+  }
+};
+
 // update order status 
 export const updateOrderStatus = async (req, res) => {
   try {
